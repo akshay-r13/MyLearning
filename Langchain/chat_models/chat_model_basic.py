@@ -9,5 +9,6 @@ result = model.invoke("What is your name")
 
 print("Result object:")
 print(result)
+print("-----")
 print("Result object content:")
 print(result.content)
