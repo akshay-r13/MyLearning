@@ -1,6 +1,8 @@
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from typing import List
+from langchain_core.runnables import RunnableLambda
 
 model_name = "sentence-transformers/all-mpnet-base-v2"
 model_kwargs = {'device': 'cpu'}
@@ -40,3 +42,19 @@ vectorstore = Chroma.from_documents(
 )
 
 print(vectorstore.similarity_search("cat"))
+
+print(vectorstore.similarity_search_with_score("cat"))
+
+embedding = HuggingFaceEmbeddings().embed_query("cat")
+print(vectorstore.similarity_search_by_vector(embedding))
+
+retriever = RunnableLambda(vectorstore.similarity_search).bind(k=1)  # select top result
+
+print(retriever.batch(["cat", "shark"]))
+
+retriever = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 1},
+)
+
+print(retriever.batch(["cat", "shark"]))
